@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 
 class Dictionary:
@@ -9,7 +9,7 @@ class Dictionary:
         self.size = 0
         self.table = [None] * self.capacity
 
-    def _find_slot(self, key: Any) -> int:
+    def _find_slot(self, key: Any) -> Optional[int]:
         hash_key = hash(key) % self.capacity
         start_point = hash_key
         while True:
@@ -21,9 +21,9 @@ class Dictionary:
                 return hash_key
             hash_key = (hash_key + 1) % self.capacity
             if hash_key == start_point:
-                raise RuntimeError()
+                raise RuntimeError("Hash table is full")
 
-    def _find_key(self, key: Any) -> None:
+    def _find_key(self, key: Any) -> Optional[int]:
         hash_key = hash(key) % self.capacity
         start_point = hash_key
 
@@ -55,9 +55,9 @@ class Dictionary:
             or self.table[hash_key] is self.DELETED
         ):
             self.size += 1
-        self.table[hash_key] = (key, value)
+        self.table[hash_key] = (key, value, hash_key)
 
-    def __getitem__(self, item: Any) -> None:
+    def __getitem__(self, item: Any) -> Any:
         hash_item = self._find_key(item)
         if (
             hash_item is None
@@ -86,7 +86,7 @@ class Dictionary:
         self.table = [None] * self.capacity
         self.size = 0
 
-    def get(self, key: Any) -> None:
+    def get(self, key: Any) -> Any:
         hash_key = self._find_key(key)
         if (
                 hash_key is None
@@ -97,7 +97,7 @@ class Dictionary:
         if self.table[hash_key][0] == key:
             return self.table[hash_key][1]
 
-    def pop(self, key: Any) -> None:
+    def pop(self, key: Any) -> Any:
         hash_key = self._find_key(key)
         if (
                 hash_key is None
@@ -155,5 +155,5 @@ class Dictionary:
             item = self.table[self.current]
             self.current += 1
             if item is not None and item is not self.DELETED:
-                return item
+                return item[0]
         raise StopIteration
