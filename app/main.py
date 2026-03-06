@@ -85,7 +85,7 @@ class Dictionary:
         self.table = [None] * self.capacity
         self.size = 0
 
-    def get(self, key: Any, default = None) -> Any:
+    def get(self, key: Any, default: Any = None) -> Any:
         hash_key = self._find_key(key)
         if (
                 hash_key is None
@@ -95,7 +95,7 @@ class Dictionary:
         if self.table[hash_key][0] == key:
             return self.table[hash_key][1]
 
-    def pop(self, key: Any, default = _sentinel) -> Any:
+    def pop(self, key: Any, default: Any = _sentinel) -> Any:
         hash_key = self._find_key(key)
         if hash_key is None:
             if default is self._sentinel:
