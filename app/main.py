@@ -3,6 +3,7 @@ from typing import Any, Optional
 
 class Dictionary:
     DELETED = object()
+    _sentinel = object()
 
     def __init__(self) -> None:
         self.capacity = 8
@@ -62,7 +63,6 @@ class Dictionary:
         if (
             hash_item is None
             or self.table[hash_item] is None
-            or self.table[hash_item] is self.DELETED
         ):
             raise KeyError(item)
         return self.table[hash_item][1]
@@ -75,7 +75,6 @@ class Dictionary:
         if (
                 hash_key is None
                 or self.table[hash_key] is None
-                or self.table[hash_key] is self.DELETED
         ):
             raise KeyError(key)
         if self.table[hash_key][0] == key:
@@ -86,25 +85,22 @@ class Dictionary:
         self.table = [None] * self.capacity
         self.size = 0
 
-    def get(self, key: Any) -> Any:
+    def get(self, key: Any, default = None) -> Any:
         hash_key = self._find_key(key)
         if (
                 hash_key is None
                 or self.table[hash_key] is None
-                or self.table[hash_key] is self.DELETED
         ):
-            raise KeyError(key)
+            return default
         if self.table[hash_key][0] == key:
             return self.table[hash_key][1]
 
-    def pop(self, key: Any) -> Any:
+    def pop(self, key: Any, default = _sentinel) -> Any:
         hash_key = self._find_key(key)
-        if (
-                hash_key is None
-                or self.table[hash_key] is None
-                or self.table[hash_key] is self.DELETED
-        ):
-            raise KeyError(key)
+        if hash_key is None:
+            if default is self._sentinel:
+                raise KeyError(key)
+            return default
 
         value = self.table[hash_key][1]
         self.table[hash_key] = self.DELETED
@@ -142,7 +138,7 @@ class Dictionary:
             for slot in self.table
             if slot is not None
             and slot is not self.DELETED
-            for key, value in [slot]
+            for key, value, _ in [slot]
         }
         return f"{dictionary}"
 
